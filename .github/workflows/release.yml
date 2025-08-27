@@ -1,14 +1,12 @@
-name: Releases
+name: Linux Build on Star
 
 on:
   watch:
     types: [started]
 
 jobs:
-  release:
+  linux-build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,9 +23,9 @@ jobs:
           chmod +x bin/release-linux.sh
           bash bin/release-linux.sh
 
-      - name: Create Release
-        uses: ncipollo/release-action@v1
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
         with:
-          artifacts: "dist/*"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body: "Automated release triggered by star event - Linux build"
+          name: linux-build
+          path: dist/*
+          if-no-files-found: error
