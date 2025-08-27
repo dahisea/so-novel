@@ -1,13 +1,12 @@
 name: Releases
 
 on:
-  push:
-    tags:
-      - 'v*'
+  watch:
+    types: [started]
 
 jobs:
   release:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
@@ -19,21 +18,16 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '17'
-          # 启用 Maven 依赖缓存，以提高构建速度
           cache: 'maven'
 
-      - name: Build executable
-        shell: powershell
+      - name: Build Linux executable
         run: |
-          bash bin/release-windows.sh
+          chmod +x bin/release-linux.sh
           bash bin/release-linux.sh
-          bash bin/release-macos.sh
-          bash bin/release-macos.sh x64
 
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          # 表示要上传到 Release 的产出文件。这可能是单个路径或以逗号分隔的路径列表（或 globs）
           artifacts: "dist/*"
-          token: ${{ secrets.GITHUB_TOKEN  }}
-          bodyFile: "CHANGELOG.md"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: "Automated release triggered by star event - Linux build"
